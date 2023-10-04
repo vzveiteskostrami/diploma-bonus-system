@@ -1,3 +1,73 @@
 package main
 
-func main() {}
+import (
+	"net/http"
+	"strconv"
+	"time"
+
+	"github.com/go-chi/chi"
+	"github.com/vzveiteskostrami/diploma-bonus-system/internal/auth"
+	"github.com/vzveiteskostrami/diploma-bonus-system/internal/compressing"
+	"github.com/vzveiteskostrami/diploma-bonus-system/internal/config"
+	"github.com/vzveiteskostrami/diploma-bonus-system/internal/dbf"
+	"github.com/vzveiteskostrami/diploma-bonus-system/internal/logging"
+)
+
+var (
+	srv *http.Server
+)
+
+func main() {
+	logging.LoggingInit()
+	defer logging.LoggingSync()
+	config.ReadData()
+	dbf.MakeStorage()
+	dbf.Store.DBFInit()
+	defer dbf.Store.DBFClose()
+
+	srv = &http.Server{
+		Addr:        config.Addresses.In.Host + ":" + strconv.Itoa(config.Addresses.In.Port),
+		Handler:     mainRouter(),
+		IdleTimeout: time.Second * 1,
+	}
+
+	logging.S().Infow(
+		"Starting server",
+		"addr", config.Addresses.In.Host+":"+strconv.Itoa(config.Addresses.In.Port),
+	)
+	logging.S().Fatal(srv.ListenAndServe())
+}
+
+func mainRouter() chi.Router {
+	r := chi.NewRouter()
+
+	r.Route("/api", func(r chi.Router) {
+		r.Use(compressing.GZIPHandle)
+		r.Use(logging.WithLogging)
+		r.Use(auth.AuthHandle)
+		//r.Post("/shorten", shorturl.SetJSONLinkf)
+		//r.Post("/shorten/batch", shorturl.SetJSONBatchLinkf)
+		//r.Get("/user/urls", shorturl.GetOwnerURLsListf)
+		//r.Delete("/user/urls", shorturl.DeleteOwnerURLsListf)
+	})
+
+	r.Route("/ping", func(r chi.Router) {
+		r.Use(logging.WithLogging)
+		r.Get("/", dbf.Store.PingDBf)
+	})
+
+	r.Route("/{shlink}", func(r chi.Router) {
+		r.Use(compressing.GZIPHandle)
+		r.Use(logging.WithLogging)
+		//r.Get("/", shorturl.GetLinkf)
+	})
+
+	r.Route("/", func(r chi.Router) {
+		r.Use(compressing.GZIPHandle)
+		r.Use(logging.WithLogging)
+		r.Use(auth.AuthHandle)
+		//r.Post("/", shorturl.SetLinkf)
+	})
+
+	return r
+}
