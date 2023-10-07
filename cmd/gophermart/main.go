@@ -28,8 +28,6 @@ func main() {
 	dbf.Store.DBFInit()
 	defer dbf.Store.DBFClose()
 
-	logging.S().Infow("Адрес и порт сервера:", config.Addresses.In.Host+":"+strconv.Itoa(config.Addresses.In.Port))
-
 	srv = &http.Server{
 		Addr:        config.Addresses.In.Host + ":" + strconv.Itoa(config.Addresses.In.Port),
 		Handler:     mainRouter(),

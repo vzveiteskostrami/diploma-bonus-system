@@ -96,5 +96,5 @@ func ReadData() {
 	// сохранена/закомментирована эмуляция указания БД в параметрах вызова.
 	// Необходимо для быстрого перехода тестирования работы приложения с
 	// Postgres.
-	//Storage.DBConnect = "host=127.0.0.1 port=5432 user=executor password=executor dbname=gophermart sslmode=disable"
+	Storage.DBConnect = "host=127.0.0.1 port=5432 user=executor password=executor dbname=gophermart sslmode=disable"
 }

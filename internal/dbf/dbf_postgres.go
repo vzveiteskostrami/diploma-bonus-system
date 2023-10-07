@@ -82,7 +82,7 @@ func (d *PGStorage) Register(login *string, password *string) (code int, err err
 }
 
 func (d *PGStorage) GetUserOrders(userID int64) (orders []Order, err error) {
-	rows, err := d.db.QueryContext(context.Background(), "SELECT OID,USERID,NUMBER,STATUS,ACCRUAL,UPLOADED_AT,DELETE_FLAG from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG ORDER BY UPLOADED_AT;", userID)
+	rows, err := d.db.QueryContext(context.Background(), "SELECT OID,USERID,NUMBER,STATUS,ACCRUAL,NEW_DATE,DELETE_FLAG from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG ORDER BY NEW_DATE;", userID)
 	if err == nil && rows.Err() != nil {
 		err = rows.Err()
 	}
@@ -181,7 +181,7 @@ func (d *PGStorage) SaveOrderNum(userID int64, number string) (code int, err err
 		}
 	}
 
-	_, err = d.db.ExecContext(context.Background(), "INSERT INTO ORDERS (OID,USERID,NUMBER,STATUS,ACCRUAL,UPLOADED_AT,DELETE_FLAG) VALUES ($1,$2,$3,'NEW',0,$4,false);", oID, userID, number, time.Now())
+	_, err = d.db.ExecContext(context.Background(), "INSERT INTO ORDERS (OID,USERID,NUMBER,STATUS,ACCRUAL,WITHDRAWN,NEW_DATE,DELETE_FLAG) VALUES ($1,$2,$3,'NEW',0,0,$4,false);", oID, userID, number, time.Now())
 	if err != nil {
 		logging.S().Error(err)
 		code = http.StatusInternalServerError
