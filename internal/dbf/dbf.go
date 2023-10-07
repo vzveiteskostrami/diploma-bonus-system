@@ -2,9 +2,13 @@ package dbf
 
 import (
 	"net/http"
+	"sync"
+	"time"
 
 	_ "github.com/lib/pq"
 )
+
+var lockWrite sync.Mutex
 
 var Store GSStorage
 
@@ -16,20 +20,31 @@ func MakeStorage() {
 type GSStorage interface {
 	DBFInit() int64
 	DBFClose()
-	DBFSaveLink(storageURLItem *StorageURL) error
-	FindLink(link string, byLink bool) (StorageURL, bool)
 	PingDBf(w http.ResponseWriter, r *http.Request)
-	DBFGetOwnURLs(ownerID int64) ([]StorageURL, error)
 	AddToDel(surl string)
 	BeginDel()
 	EndDel()
 	PrintDBF()
+	UserIDExists(userID int64) (ok bool, err error)
+	Register(login *string, password *string) (code int, err error)
+	Authent(login *string, password *string) (token string, code int, err error)
+	SaveOrderNum(userID int64, number string) (code int, err error)
+	GetUserOrders(userID int64) (orders []Order, err error)
+	GetUserBalance(userID int64) (balance Balance, err error)
 }
 
-type StorageURL struct {
-	OWNERID     int64  `json:"ownerid"`
-	UUID        int64  `json:"uuid"`
-	ShortURL    string `json:"short_url"`
-	OriginalURL string `json:"original_url"`
-	Deleted     bool   `json:"deleted"`
+type Order struct {
+	oid         *int64
+	userid      *int64
+	Number      *string  `json:"number,omitempty"`
+	Status      *string  `json:"status,omitempty"`
+	Accrual     *float32 `json:"accural,omitempty"`
+	Uploaded_at *string  `json:"uploaded_at,omitempty"`
+	uploaded_at *time.Time
+	delete_flag *bool
+}
+
+type Balance struct {
+	Current   *float32 `json:"current,omitempty"`
+	Withdrawn *float32 `json:"withdrawn,omitempty"`
 }

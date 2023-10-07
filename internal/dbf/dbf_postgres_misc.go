@@ -44,8 +44,14 @@ func (d *PGStorage) tableInitData() (int64, error) {
 		return -1, errors.New("база данных не инициализирована")
 	}
 	_, err := d.db.ExecContext(context.Background(),
-		"CREATE TABLE IF NOT EXISTS UDATA(USERID bigint not null,USER_NAME character varying(30) NOT NULL,USER_PWD character varying(100) NOT NULL,DELETE_FLAG boolean DEFAULT false);"+
-			"CREATE UNIQUE INDEX IF NOT EXISTS udata1 ON udata (USER_NAME);"+
+		"CREATE TABLE IF NOT EXISTS UDATA(USERID bigint not null,USER_NAME character varying(64) NOT NULL,USER_PWD character varying(64) NOT NULL,DELETE_FLAG boolean DEFAULT false);"+
+			"CREATE UNIQUE INDEX IF NOT EXISTS udata1 ON udata (USERID);"+
+			"CREATE UNIQUE INDEX IF NOT EXISTS udata2 ON udata (USER_NAME);"+
+			"CREATE TABLE IF NOT EXISTS ORDERS(OID bigint not null,USERID bigint not null,NUMBER character varying(64) NOT NULL,STATUS character varying(10) NOT NULL,ACCRUAL double precision NOT NULL,WITHDRAWN double precision NOT NULL, UPLOADED_AT timestamp with time zone NOT NULL,DELETE_FLAG boolean DEFAULT false);"+
+			"CREATE UNIQUE INDEX IF NOT EXISTS orders1 ON orders (OID);"+
+			"CREATE INDEX IF NOT EXISTS orders2 ON orders (UPLOADED_AT);"+
+			"CREATE INDEX IF NOT EXISTS orders3 ON orders (USERID,UPLOADED_AT);"+
+			"CREATE UNIQUE INDEX IF NOT EXISTS orders4 ON orders (NUMBER);"+
 			"create sequence if not exists gen_oid as bigint minvalue 1 no maxvalue start 1 no cycle;")
 
 	if err != nil {

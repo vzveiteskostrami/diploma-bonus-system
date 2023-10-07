@@ -11,6 +11,7 @@ import (
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/config"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/dbf"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/logging"
+	"github.com/vzveiteskostrami/diploma-bonus-system/internal/routes"
 )
 
 var (
@@ -20,7 +21,9 @@ var (
 func main() {
 	logging.LoggingInit()
 	defer logging.LoggingSync()
+
 	config.ReadData()
+
 	dbf.MakeStorage()
 	dbf.Store.DBFInit()
 	defer dbf.Store.DBFClose()
@@ -41,33 +44,49 @@ func main() {
 func mainRouter() chi.Router {
 	r := chi.NewRouter()
 
-	r.Route("/api", func(r chi.Router) {
+	r.Route("/api/user/register", func(r chi.Router) {
+		r.Use(compressing.GZIPHandle)
+		r.Use(logging.WithLogging)
+		r.Post("/", routes.Registerf)
+	})
+
+	r.Route("/api/user/login", func(r chi.Router) {
+		r.Use(compressing.GZIPHandle)
+		r.Use(logging.WithLogging)
+		r.Post("/", routes.Authf)
+	})
+
+	r.Route("/api/user", func(r chi.Router) {
 		r.Use(compressing.GZIPHandle)
 		r.Use(logging.WithLogging)
 		r.Use(auth.AuthHandle)
-		//r.Post("/shorten", shorturl.SetJSONLinkf)
+		r.Post("/orders", routes.OrdersPostf)
+		r.Get("/orders", routes.OrdersGetf)
+		r.Get("/balance", routes.BalanceGetf)
 		//r.Post("/shorten/batch", shorturl.SetJSONBatchLinkf)
 		//r.Get("/user/urls", shorturl.GetOwnerURLsListf)
 		//r.Delete("/user/urls", shorturl.DeleteOwnerURLsListf)
 	})
 
-	r.Route("/ping", func(r chi.Router) {
-		r.Use(logging.WithLogging)
-		r.Get("/", dbf.Store.PingDBf)
-	})
+	/*
+		r.Route("/ping", func(r chi.Router) {
+			r.Use(logging.WithLogging)
+			r.Get("/", dbf.Store.PingDBf)
+		})
 
-	r.Route("/{shlink}", func(r chi.Router) {
-		r.Use(compressing.GZIPHandle)
-		r.Use(logging.WithLogging)
-		//r.Get("/", shorturl.GetLinkf)
-	})
+		r.Route("/{shlink}", func(r chi.Router) {
+			r.Use(compressing.GZIPHandle)
+			r.Use(logging.WithLogging)
+			//r.Get("/", shorturl.GetLinkf)
+		})
 
-	r.Route("/", func(r chi.Router) {
-		r.Use(compressing.GZIPHandle)
-		r.Use(logging.WithLogging)
-		r.Use(auth.AuthHandle)
-		//r.Post("/", shorturl.SetLinkf)
-	})
+		r.Route("/", func(r chi.Router) {
+			r.Use(compressing.GZIPHandle)
+			r.Use(logging.WithLogging)
+			//r.Use(auth.AuthHandle)
+			//r.Post("/", shorturl.SetLinkf)
+		})
+	*/
 
 	return r
 }
