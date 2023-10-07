@@ -171,9 +171,9 @@ func (d *PGStorage) SaveOrderNum(userID int64, number string) (code int, err err
 		return
 	}
 
-	var oId int64
+	var oID int64
 	if rows.Next() {
-		err = rows.Scan(&oId)
+		err = rows.Scan(&oID)
 		if err != nil {
 			logging.S().Error(err)
 			code = http.StatusInternalServerError
@@ -181,7 +181,7 @@ func (d *PGStorage) SaveOrderNum(userID int64, number string) (code int, err err
 		}
 	}
 
-	_, err = d.db.ExecContext(context.Background(), "INSERT INTO ORDERS (OID,USERID,NUMBER,STATUS,ACCRUAL,UPLOADED_AT,DELETE_FLAG) VALUES ($1,$2,$3,'NEW',0,$4,false);", oId, userID, number, time.Now())
+	_, err = d.db.ExecContext(context.Background(), "INSERT INTO ORDERS (OID,USERID,NUMBER,STATUS,ACCRUAL,UPLOADED_AT,DELETE_FLAG) VALUES ($1,$2,$3,'NEW',0,$4,false);", oID, userID, number, time.Now())
 	if err != nil {
 		logging.S().Error(err)
 		code = http.StatusInternalServerError
@@ -209,10 +209,10 @@ func (d *PGStorage) Authent(login *string, password *string) (token string, code
 	defer rows.Close()
 
 	ok := false
-	var userId int64
+	var userID int64
 	var dtbPwd string
 	if rows.Next() {
-		err = rows.Scan(&userId, &dtbPwd)
+		err = rows.Scan(&userID, &dtbPwd)
 		if err != nil {
 			logging.S().Error(err)
 			code = http.StatusInternalServerError
@@ -226,7 +226,7 @@ func (d *PGStorage) Authent(login *string, password *string) (token string, code
 	}
 
 	if ok {
-		token, err = misc.MakeToken(userId)
+		token, err = misc.MakeToken(userID)
 		if err != nil {
 			logging.S().Error(err)
 			code = http.StatusInternalServerError

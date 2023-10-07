@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/auth"
@@ -122,7 +121,7 @@ func Registerf(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			http.Error(w, err.Error(), code)
 		} else {
-			r.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+			r.Body = io.NopCloser(bytes.NewBuffer(body))
 			Authf(w, r)
 		}
 	case <-r.Context().Done():
