@@ -43,6 +43,8 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 
 	logging.S().Infoln("!!!!!!", "User:", r.Context().Value(auth.CPuserID).(int64))
 
+	w.WriteHeader(http.StatusOK)
+
 	go func() {
 		orders, err = dbf.Store.GetUserOrders(r.Context().Value(auth.CPuserID).(int64))
 		completed <- struct{}{}
@@ -66,7 +68,6 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				logging.S().Infoln("!!!!!!", "Отдали")
-				w.WriteHeader(http.StatusOK)
 				w.Write(buf.Bytes())
 			}
 		}
@@ -82,6 +83,8 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 
 	var balance dbf.Balance
 	var err error
+
+	w.WriteHeader(http.StatusOK)
 
 	go func() {
 		balance, err = dbf.Store.GetUserBalance(r.Context().Value(auth.CPuserID).(int64))
