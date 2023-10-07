@@ -43,6 +43,7 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 
 	logging.S().Infoln("!!!!!!", "User:", r.Context().Value(auth.CPuserID).(int64))
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	go func() {
@@ -56,7 +57,6 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 			logging.S().Infoln("!!!!!!", "errorr:", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
-			w.Header().Set("Content-Type", "application/json")
 			if len(orders) == 0 {
 				logging.S().Infoln("!!!!!!", "Пусто")
 				http.Error(w, "Нет данных для ответа", http.StatusNoContent)
@@ -85,6 +85,7 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
 
 	go func() {
 		balance, err = dbf.Store.GetUserBalance(r.Context().Value(auth.CPuserID).(int64))
@@ -101,7 +102,6 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			w.Header().Set("Content-Type", "application/json")
 			w.Write(buf.Bytes())
 		}
 	case <-r.Context().Done():
