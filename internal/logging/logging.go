@@ -84,6 +84,7 @@ func WithLogging(h http.Handler) http.Handler {
 		aa := ContextParam{Completed: true}
 		ctx := context.WithValue(r.Context(), ContextCompletedKey, aa)
 		// точка, где выполняется внутренний хендлер
+		S().Infoln("^^^^")
 		h.ServeHTTP(&lw, r.WithContext(ctx)) // обслуживание оригинального запроса
 
 		// Since возвращает разницу во времени между start
