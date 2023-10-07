@@ -66,6 +66,7 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				logging.S().Infoln("!!!!!!", "Отдали")
+				w.WriteHeader(http.StatusOK)
 				w.Write(buf.Bytes())
 			}
 		}
