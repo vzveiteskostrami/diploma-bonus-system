@@ -3,6 +3,8 @@ package config
 import (
 	"errors"
 	"flag"
+	"fmt"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -79,6 +81,18 @@ func ReadData() {
 	flag.Parse()
 
 	Storage.DBConnect = *dbc
+
+	var err error
+	if s, ok := os.LookupEnv("RUN_ADDRESS"); ok && s != "" {
+		Addresses.In.Host, Addresses.In.Port, err = getAddrAndPort(s)
+		if err != nil {
+			fmt.Println("Неудачный парсинг переменной окружения RUN_ADDRESS")
+		}
+	}
+	if s, ok := os.LookupEnv("DATABASE_URI"); ok && s != "" {
+		Storage.DBConnect = s
+	}
+
 	// сохранена/закомментирована эмуляция указания БД в параметрах вызова.
 	// Необходимо для быстрого перехода тестирования работы приложения с
 	// Postgres.
