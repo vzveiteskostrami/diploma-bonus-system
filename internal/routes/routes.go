@@ -41,6 +41,8 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 	var orders []dbf.Order
 	var err error
 
+	logging.S().Infoln("!!!!!!", "User:", r.Context().Value(auth.CPuserID).(int64))
+
 	go func() {
 		orders, err = dbf.Store.GetUserOrders(r.Context().Value(auth.CPuserID).(int64))
 		completed <- struct{}{}
@@ -49,21 +51,26 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 	select {
 	case <-completed:
 		if err != nil {
+			logging.S().Infoln("!!!!!!", "errorr:", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
+			w.Header().Set("Content-Type", "application/json")
 			if len(orders) == 0 {
+				logging.S().Infoln("!!!!!!", "Пусто")
 				http.Error(w, "Нет данных для ответа", http.StatusNoContent)
+				w.Write([]byte("{}"))
 			} else {
 				var buf bytes.Buffer
 				if err := json.NewEncoder(&buf).Encode(orders); err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
-				w.Header().Set("Content-Type", "application/json")
+				logging.S().Infoln("!!!!!!", "Отдали")
 				w.Write(buf.Bytes())
 			}
 		}
 	case <-r.Context().Done():
+		logging.S().Infoln("!!!!!!", "Долго")
 		logging.S().Infoln("Получение данных прервано на клиентской стороне")
 		w.WriteHeader(http.StatusGone)
 	}
