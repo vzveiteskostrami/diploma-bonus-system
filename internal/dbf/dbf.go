@@ -34,14 +34,14 @@ type GSStorage interface {
 }
 
 type Order struct {
-	oid         *int64
-	userid      *int64
-	Number      *string  `json:"number,omitempty"`
-	Status      *string  `json:"status,omitempty"`
-	Accrual     *float32 `json:"accural,omitempty"`
-	Uploaded_at *string  `json:"uploaded_at,omitempty"`
-	uploaded_at *time.Time
-	delete_flag *bool
+	oid        *int64
+	userid     *int64
+	Number     *string  `json:"number,omitempty"`
+	Status     *string  `json:"status,omitempty"`
+	Accrual    *float32 `json:"accural,omitempty"`
+	UploadedAt *string  `json:"uploaded_at,omitempty"`
+	uploadedAt *time.Time
+	deleteFlag *bool
 }
 
 type Balance struct {

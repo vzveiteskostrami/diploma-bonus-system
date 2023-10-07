@@ -157,7 +157,7 @@ func MakeToken(userID int64) (string, error) {
 	return tokenString, nil
 }
 
-func GetUserData(tokenString string) (int64, bool) {
+func GetUserData(tokenString string) (int64, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -168,16 +168,16 @@ func GetUserData(tokenString string) (int64, bool) {
 
 	if err != nil {
 		logging.S().Errorw(err.Error())
-		return -1, false
+		return -1, err
 	}
 
 	if !token.Valid {
 		logging.S().Errorw("Token is not valid: " + tokenString)
-		return -1, false
+		return -1, errors.New("token is not valid")
 	}
 
 	// возвращаем ID пользователя в читаемом виде
-	return claims.UserID, true
+	return claims.UserID, nil
 }
 
 func ExtractRegInfo(r io.Reader) (RegInfo, error) {

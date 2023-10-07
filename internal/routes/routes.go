@@ -101,8 +101,8 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 }
 
 func Registerf(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	regIn, err := misc.ExtractRegInfo(ioutil.NopCloser(bytes.NewBuffer(body)))
+	body, err := io.ReadAll(r.Body)
+	regIn, err := misc.ExtractRegInfo(io.NopCloser(bytes.NewBuffer(body)))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

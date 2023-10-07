@@ -28,7 +28,7 @@ func AuthHandle(next http.Handler) http.Handler {
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
-		} else if userID, ok = misc.GetUserData(cu.Value); !ok {
+		} else if userID, err = misc.GetUserData(cu.Value); err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 		}
 

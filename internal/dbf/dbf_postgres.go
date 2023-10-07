@@ -59,9 +59,9 @@ func (d *PGStorage) Register(login *string, password *string) (code int, err err
 		return
 	}
 
-	var userId int64
+	var userID int64
 	if rows.Next() {
-		err = rows.Scan(&userId)
+		err = rows.Scan(&userID)
 		if err != nil {
 			logging.S().Error(err)
 			code = http.StatusInternalServerError
@@ -71,7 +71,7 @@ func (d *PGStorage) Register(login *string, password *string) (code int, err err
 
 	hashPwd := misc.Hash256(*password)
 
-	_, err = d.db.ExecContext(context.Background(), "INSERT INTO UDATA (USERID,USER_NAME,USER_PWD,DELETE_FLAG) VALUES ($1,$2,$3,false);", userId, hashLogin, hashPwd)
+	_, err = d.db.ExecContext(context.Background(), "INSERT INTO UDATA (USERID,USER_NAME,USER_PWD,DELETE_FLAG) VALUES ($1,$2,$3,false);", userID, hashLogin, hashPwd)
 	if err != nil {
 		logging.S().Error(err)
 		code = http.StatusInternalServerError
@@ -95,13 +95,13 @@ func (d *PGStorage) GetUserOrders(userID int64) (orders []Order, err error) {
 	orders = make([]Order, 0)
 	order := Order{}
 	for rows.Next() {
-		err = rows.Scan(&order.oid, &order.userid, &order.Number, &order.Status, &order.Accrual, &order.uploaded_at, &order.delete_flag)
+		err = rows.Scan(&order.oid, &order.userid, &order.Number, &order.Status, &order.Accrual, &order.uploadedAt, &order.deleteFlag)
 		if err != nil {
 			logging.S().Error()
 			return
 		}
-		tm := order.uploaded_at.Format(time.RFC3339)
-		order.Uploaded_at = &tm
+		tm := order.uploadedAt.Format(time.RFC3339)
+		order.UploadedAt = &tm
 		orders = append(orders, order)
 	}
 	return
