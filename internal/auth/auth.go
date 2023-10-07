@@ -44,6 +44,7 @@ func AuthHandle(next http.Handler) http.Handler {
 			return
 		} else if !ok {
 			err = errors.New("userId не найден в системе")
+			logging.S().Error(err)
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
