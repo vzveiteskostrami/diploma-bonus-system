@@ -100,7 +100,7 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 }
 
 func BalanceGetf(w http.ResponseWriter, r *http.Request) {
-	completed := make(chan struct{})
+	//completed := make(chan struct{})
 
 	var balance dbf.Balance
 	//var err error
