@@ -100,18 +100,14 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 }
 
 func BalanceGetf(w http.ResponseWriter, r *http.Request) {
-	//completed := make(chan struct{})
+	completed := make(chan struct{})
 
 	var balance dbf.Balance
-	//var err error
+	var err error
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	var buf bytes.Buffer
-	balance.Current = new(float32)
-	balance.Withdrawn = new(float32)
-	*balance.Current = 555.55
-	*balance.Withdrawn = 444.44
 
 	if err := json.NewEncoder(&buf).Encode(balance); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -120,34 +116,30 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(buf.Bytes())
 	logging.S().Infoln("BALANCEGET:", buf.String())
-	//return
 
-	/*
+	go func() {
+		balance, err = dbf.Store.GetUserBalance(r.Context().Value(auth.CPuserID).(int64))
+		completed <- struct{}{}
+	}()
 
-		go func() {
-			balance, err = dbf.Store.GetUserBalance(r.Context().Value(auth.CPuserID).(int64))
-			completed <- struct{}{}
-		}()
-
-		select {
-		case <-completed:
-			if err != nil {
+	select {
+	case <-completed:
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			var buf bytes.Buffer
+			if err := json.NewEncoder(&buf).Encode(balance); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
-			} else {
-				var buf bytes.Buffer
-				if err := json.NewEncoder(&buf).Encode(balance); err != nil {
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
-				}
-				w.Header().Set("Content-Type", "application/json")
-				w.Write(buf.Bytes())
-				logging.S().Infoln("BALANCEGET:", buf.String())
+				return
 			}
-		case <-r.Context().Done():
-			logging.S().Infoln("Получение данных прервано на клиентской стороне")
-			w.WriteHeader(http.StatusGone)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(buf.Bytes())
+			logging.S().Infoln("BALANCEGET:", buf.String())
 		}
-	*/
+	case <-r.Context().Done():
+		logging.S().Infoln("Получение данных прервано на клиентской стороне")
+		w.WriteHeader(http.StatusGone)
+	}
 }
 
 func WithdrawGetf(w http.ResponseWriter, r *http.Request) {
@@ -176,6 +168,7 @@ func WithdrawGetf(w http.ResponseWriter, r *http.Request) {
 			}
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(buf.Bytes())
+			logging.S().Infoln("WITHDRAWGET:", buf.String())
 		}
 	case <-r.Context().Done():
 		logging.S().Infoln("Получение данных прервано на клиентской стороне")
@@ -237,7 +230,7 @@ func Authf(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), code)
 		} else {
 			http.SetCookie(w, &http.Cookie{Name: "token", Value: token, HttpOnly: true})
-			//w.Header().Set("Content-Type", "text/plain")
+			w.Header().Set("Content-Type", "text/plain")
 			w.WriteHeader(code)
 			w.Write([]byte(token))
 		}

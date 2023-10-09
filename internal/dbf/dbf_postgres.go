@@ -149,6 +149,7 @@ func (d *PGStorage) WithdrawAccrual(number string, withdraw float32) (code int, 
 		logging.S().Error(err)
 		code = http.StatusInternalServerError
 	}
+	logging.S().Infoln("ACCRUAL:", withdraw+withdrawn)
 
 	return
 }
