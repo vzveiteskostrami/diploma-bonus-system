@@ -93,11 +93,11 @@ func getOrderInfo(number string) (o Order, ok bool) {
 			logging.S().Infoln("Ошибка:", err)
 			return
 		}
-		logging.S().Infoln("OUTACCURAL:", getO.Accural)
+		logging.S().Infoln("OUTACCURAL:", getO.Accrual)
 
 		v := misc.StatusStrToInt(getO.Status)
 		o.status = &v
-		o.Accrual = &getO.Accural
+		o.Accrual = &getO.Accrual
 		ok = true
 	} else {
 		logging.S().Infoln("Get answer no 200")
