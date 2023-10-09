@@ -106,16 +106,6 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	var buf bytes.Buffer
-
-	if err := json.NewEncoder(&buf).Encode(balance); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(buf.Bytes())
-	logging.S().Infoln("BALANCEGET:", buf.String())
 
 	go func() {
 		balance, err = dbf.Store.GetUserBalance(r.Context().Value(auth.CPuserID).(int64))
