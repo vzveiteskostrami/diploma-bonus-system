@@ -71,7 +71,7 @@ func (d *PGStorage) OrdersCheck() {
 type getOrder struct {
 	Order   string  `json:"order,omitempty"`
 	Status  string  `json:"status,omitempty"`
-	Accrual float32 `json:"accrual,order,omitempty"`
+	Accrual float32 `json:"accrual,omitempty"`
 }
 
 func getOrderInfo(number string) (o Order, ok bool) {
