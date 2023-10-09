@@ -51,10 +51,12 @@ func OrdersPostf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logging.S().Infoln("ORDERIN:", sOrder)
 	code, err := dbf.Store.SaveOrderNum(r.Context().Value(auth.CPuserID).(int64), sOrder)
 	if err != nil {
 		http.Error(w, err.Error(), code)
 	} else {
+		logging.S().Infoln("ORDERINOK:", sOrder)
 		w.WriteHeader(code)
 	}
 }
