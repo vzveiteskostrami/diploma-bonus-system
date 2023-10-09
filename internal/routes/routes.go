@@ -88,7 +88,7 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 			}
 			//logging.S().Infoln("!!!!!!", "Отдали")
 			w.Write(buf.Bytes())
-			logging.S().Infoln("Отдали", buf)
+			logging.S().Infoln("Отдали", buf.String())
 		}
 	}
 }

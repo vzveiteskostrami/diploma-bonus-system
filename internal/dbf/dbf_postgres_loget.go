@@ -40,7 +40,7 @@ func (d *PGStorage) OrdersCheck() {
 			if ok {
 				if *order.Accrual != *loy.Accrual || *order.status != *loy.status {
 					params = append(params, order.oid, loy.Accrual, loy.status)
-					delSQLBody += "($" + strconv.Itoa(num) + ",$" + strconv.Itoa(num+1) + ",$" + strconv.Itoa(num+2) + ")"
+					exec += "($" + strconv.Itoa(num) + ",$" + strconv.Itoa(num+1) + ",$" + strconv.Itoa(num+2) + ")"
 					num += 3
 				}
 			}
