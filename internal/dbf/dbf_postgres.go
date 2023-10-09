@@ -82,6 +82,12 @@ func (d *PGStorage) Register(login *string, password *string) (code int, err err
 }
 
 func (d *PGStorage) GetUserOrders(userID int64) (orders []Order, err error) {
+	defer func() {
+		if err := recover(); err != nil {
+			logging.S().Infoln("ПАНИКА!!!")
+		}
+	}()
+
 	rows, err := d.db.QueryContext(context.Background(), "SELECT OID,USERID,NUMBER,STATUS,ACCRUAL,NEW_DATE,DELETE_FLAG from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG ORDER BY NEW_DATE;", userID)
 	if err == nil && rows.Err() != nil {
 		err = rows.Err()
