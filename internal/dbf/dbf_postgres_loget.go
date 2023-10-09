@@ -39,7 +39,7 @@ func (d *PGStorage) OrdersCheck() {
 			loy, ok := getOrderInfo(*order.Number)
 			if ok {
 				if *order.Accrual != *loy.Accrual || *order.status != *loy.status {
-					params = append(params, order.oid, loy.Accrual, loy.status)
+					params = append(params, loy.Accrual, loy.status, order.oid)
 					exec += "($" + strconv.Itoa(num) + ",$" + strconv.Itoa(num+1) + ",$" + strconv.Itoa(num+2) + ")"
 					num += 3
 				}
@@ -48,14 +48,14 @@ func (d *PGStorage) OrdersCheck() {
 	}
 
 	if exec != "" {
-		logging.S().Infoln("----------------------------------")
-		logging.S().Infoln("DATAUPDATE:", exec)
-		logging.S().Infoln("DATAUPDATEPARS:", params)
-		logging.S().Infoln("----------------------------------")
 		exec = "update orders set status=tmp.status,accrual=tmp.accrual from (values " +
 			exec +
 			") as tmp (oID,status,accrual) where orders.oID=tmp.oID;"
 
+		logging.S().Infoln("----------------------------------")
+		logging.S().Infoln("DATAUPDATE:", exec)
+		logging.S().Infoln("DATAUPDATEPARS:", params)
+		logging.S().Infoln("----------------------------------")
 		_, err = d.db.ExecContext(context.Background(), exec, params...)
 		if err != nil {
 			logging.S().Infoln("SQL:", exec)
