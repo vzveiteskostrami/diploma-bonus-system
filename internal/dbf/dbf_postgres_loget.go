@@ -39,7 +39,7 @@ func (d *PGStorage) OrdersCheck() {
 			loy, ok := getOrderInfo(*order.Number)
 			if ok {
 				if *order.Accrual != *loy.Accrual || *order.status != *loy.status {
-					params = append(params, loy.Accrual, loy.status, order.oid)
+					params = append(params, *order.oid, *loy.Accrual, *loy.status)
 					exec += "($" + strconv.Itoa(num) + ",$" + strconv.Itoa(num+1) + ",$" + strconv.Itoa(num+2) + ")"
 					num += 3
 				}
