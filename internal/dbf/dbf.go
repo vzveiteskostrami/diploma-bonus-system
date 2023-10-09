@@ -42,15 +42,15 @@ type Order struct {
 	Number     *string `json:"number,omitempty"`
 	Status     *string `json:"status,omitempty"`
 	status     *int16
-	Accrual    *float32 `json:"accural,omitempty"`
+	Accrual    *float32 `json:"accrual,omitempty"`
 	UploadedAt *string  `json:"uploaded_at,omitempty"`
 	uploadedAt *time.Time
 	deleteFlag *bool
 }
 
 type Balance struct {
-	Current   *float32 `json:"Current,omitempty"`
-	Withdrawn *float32 `json:"Withdrawn,omitempty"`
+	Current   *float32 `json:"current,omitempty"`
+	Withdrawn *float32 `json:"withdrawn,omitempty"`
 }
 
 type Withdraw struct {
