@@ -71,7 +71,7 @@ func mainRouter() chi.Router {
 		r.Post("/orders", routes.OrdersPostf)
 		r.Get("/orders", routes.OrdersGetf)
 		r.Get("/balance", routes.BalanceGetf)
-		r.Post("/withdraw", routes.WithdrawPostf)
+		r.Post("/balance/withdraw", routes.WithdrawPostf)
 		r.Get("/withdrawals", routes.WithdrawGetf)
 	})
 

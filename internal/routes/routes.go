@@ -90,6 +90,7 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				w.Write(buf.Bytes())
+				logging.S().Infoln("ORDERSGET:", buf.String())
 			}
 		}
 	case <-r.Context().Done():
@@ -124,7 +125,7 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 			}
 			w.Header().Set("Content-Type", "application/json")
 			w.Write(buf.Bytes())
-			logging.S().Infoln("BALANCECURRENT2:", buf.String())
+			logging.S().Infoln("BALANCEGET:", buf.String())
 		}
 	case <-r.Context().Done():
 		logging.S().Infoln("Получение данных прервано на клиентской стороне")

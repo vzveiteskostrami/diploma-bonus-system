@@ -66,6 +66,8 @@ func (d *PGStorage) OrdersCheck() {
 			//logging.S().Infoln("Params:", params)
 			logging.S().Infoln("Ошибка:", err)
 		}
+		logging.S().Infoln("DATAPUT:", exec)
+
 	}
 }
 
