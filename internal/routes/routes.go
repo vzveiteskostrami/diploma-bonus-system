@@ -82,7 +82,7 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 		} else {
 			if len(orders) == 0 {
 				http.Error(w, "Нет данных для ответа", http.StatusNoContent)
-				w.Write([]byte("{}"))
+				//w.Write([]byte("{}"))
 			} else {
 				var buf bytes.Buffer
 				if err := json.NewEncoder(&buf).Encode(orders); err != nil {
