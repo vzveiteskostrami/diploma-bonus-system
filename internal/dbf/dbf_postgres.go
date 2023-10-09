@@ -183,7 +183,7 @@ func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 }
 
 func (d *PGStorage) GetUserWithdraw(userID int64) (list []Withdraw, err error) {
-	rows, err := d.db.QueryContext(context.Background(), "SELECT NUMBER,WITHDRAWN,WITHDRAWN_DATE from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG AND WITHDRAWN > 0;", userID)
+	rows, err := d.db.QueryContext(context.Background(), "SELECT NUMBER,WITHDRAWN,WITHDRAWN_DATE from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG;", userID) // AND WITHDRAWN > 0
 	if err == nil && rows.Err() != nil {
 		err = rows.Err()
 	}
