@@ -53,7 +53,7 @@ func (d *PGStorage) OrdersCheck() {
 	if exec != "" {
 		exec = "update orders set status=tmp.status,accrual=tmp.accrual from (values " +
 			exec +
-			") as tmp (oID,status,accrual) where orders.oID=tmp.oID;"
+			") as tmp (oID,accrual,status) where orders.oID=tmp.oID;"
 
 		logging.S().Infoln("----------------------------------")
 		logging.S().Infoln("DATAUPDATE:", exec)
