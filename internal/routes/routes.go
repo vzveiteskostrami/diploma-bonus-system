@@ -62,45 +62,10 @@ func OrdersPostf(w http.ResponseWriter, r *http.Request) {
 }
 
 func OrdersGetf(w http.ResponseWriter, r *http.Request) {
-	var orders []dbf.Order
-	var err error
-
-	//logging.S().Infoln("!!!!!!", "User:", r.Context().Value(auth.CPuserID).(int64))
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	orders, err = dbf.Store.GetUserOrders(r.Context().Value(auth.CPuserID).(int64))
-
-	if err != nil {
-		//logging.S().Infoln("!!!!!!", "error:", err.Error())
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	} else {
-		if len(orders) == 0 {
-			//logging.S().Infoln("!!!!!!", "Пусто")
-			http.Error(w, "Нет данных для ответа", http.StatusNoContent)
-			w.Write([]byte("{}"))
-		} else {
-			var buf bytes.Buffer
-			if err := json.NewEncoder(&buf).Encode(orders); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			//logging.S().Infoln("!!!!!!", "Отдали")
-			w.Write(buf.Bytes())
-			logging.S().Infoln("Отдали", buf.String())
-		}
-	}
-}
-
-/*
-func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 	completed := make(chan struct{})
 
 	var orders []dbf.Order
 	var err error
-
-	logging.S().Infoln("!!!!!!", "User:", r.Context().Value(auth.CPuserID).(int64))
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -113,11 +78,9 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 	select {
 	case <-completed:
 		if err != nil {
-			logging.S().Infoln("!!!!!!", "errorr:", err.Error())
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
 			if len(orders) == 0 {
-				logging.S().Infoln("!!!!!!", "Пусто")
 				http.Error(w, "Нет данных для ответа", http.StatusNoContent)
 				w.Write([]byte("{}"))
 			} else {
@@ -126,17 +89,14 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
 					return
 				}
-				logging.S().Infoln("!!!!!!", "Отдали")
 				w.Write(buf.Bytes())
 			}
 		}
 	case <-r.Context().Done():
-		logging.S().Infoln("!!!!!!", "Долго")
 		logging.S().Infoln("Получение данных прервано на клиентской стороне")
 		w.WriteHeader(http.StatusGone)
 	}
 }
-*/
 
 func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 	completed := make(chan struct{})

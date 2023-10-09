@@ -177,6 +177,7 @@ func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 			logging.S().Error()
 			return
 		}
+		logging.S().Infoln("BALANCECURRENT:", *balance.Current)
 	}
 	return
 }
