@@ -12,6 +12,12 @@ import (
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/misc"
 )
 
+type wrt struct {
+	oid     int64
+	accrual float32
+	status  int16
+}
+
 func (d *PGStorage) OrdersCheck() {
 	sql := "SELECT OID,NUMBER,ACCRUAL,STATUS from ORDERS WHERE NOT DELETE_FLAG AND STATUS IN (0,1);"
 	rows, err := d.db.QueryContext(context.Background(), sql)
@@ -25,7 +31,7 @@ func (d *PGStorage) OrdersCheck() {
 	defer rows.Close()
 
 	exec := ""
-	params := []interface{}{}
+	params := []wrt{} //interface{}{}
 
 	order := Order{}
 	num := 1
@@ -39,7 +45,9 @@ func (d *PGStorage) OrdersCheck() {
 			loy, ok := getOrderInfo(*order.Number)
 			if ok {
 				if *order.Accrual != *loy.Accrual || *order.status != *loy.status {
-					params = append(params, *order.oid, *loy.Accrual, *loy.status)
+					w := wrt{*order.oid, *loy.Accrual, *loy.status}
+					//params = append(params, *order.oid, *loy.Accrual, *loy.status)
+					params = append(params, w)
 					//exec += "(" + fmt.Sprintf("%d", *order.oid) + "," + fmt.Sprintf("%f", *loy.Accrual) + "," + fmt.Sprintf("%d", *loy.status) + ")"
 					exec += "($" + strconv.Itoa(num) + ",$" + strconv.Itoa(num+1) + ",$" + strconv.Itoa(num+2) + ")"
 					num += 3
@@ -59,7 +67,7 @@ func (d *PGStorage) OrdersCheck() {
 			logging.S().Infoln("DATAUPDATEPARS:", params)
 			logging.S().Infoln("----------------------------------")
 		*/
-		_, err = d.db.ExecContext(context.Background(), exec, params...)
+		_, err = d.db.ExecContext(context.Background(), exec, params) //...)
 		if err != nil {
 			logging.S().Infoln("SQL:", exec)
 			logging.S().Infoln("Params:", params)
