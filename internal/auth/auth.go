@@ -51,7 +51,6 @@ func AuthHandle(next http.Handler) http.Handler {
 
 		c := context.WithValue(r.Context(), CPuserID, userID)
 
-		logging.S().Infoln("Auth user:", userID)
 		next.ServeHTTP(w, r.WithContext(c))
 	})
 }
