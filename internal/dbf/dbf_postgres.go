@@ -104,7 +104,6 @@ func (d *PGStorage) GetUserOrders(userID int64) (orders []Order, err error) {
 		tm := order.uploadedAt.Format(time.RFC3339)
 		order.UploadedAt = &tm
 		order.Status = &status
-		*order.Accrual = 222.22
 		orders = append(orders, order)
 	}
 	return
@@ -172,7 +171,6 @@ func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 			logging.S().Error()
 			return
 		}
-		logging.S().Infoln("BALANCECURRENT1:", *balance.Current)
 	}
 	return
 }

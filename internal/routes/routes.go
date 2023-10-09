@@ -237,7 +237,7 @@ func Authf(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), code)
 		} else {
 			http.SetCookie(w, &http.Cookie{Name: "token", Value: token, HttpOnly: true})
-			w.Header().Set("Content-Type", "text/plain")
+			//w.Header().Set("Content-Type", "text/plain")
 			w.WriteHeader(code)
 			w.Write([]byte(token))
 		}
