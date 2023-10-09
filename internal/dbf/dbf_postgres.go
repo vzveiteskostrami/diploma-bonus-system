@@ -195,8 +195,10 @@ func (d *PGStorage) GetUserWithdraw(userID int64) (list []Withdraw, err error) {
 			logging.S().Error(err)
 			return
 		}
-		tm := item.withdrawDate.Format(time.RFC3339)
-		item.ProcessedAt = &tm
+		if item.withdrawDate != nil {
+			tm := item.withdrawDate.Format(time.RFC3339)
+			item.ProcessedAt = &tm
+		}
 		list = append(list, item)
 	}
 	return
