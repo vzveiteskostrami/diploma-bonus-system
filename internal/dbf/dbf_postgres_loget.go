@@ -69,9 +69,9 @@ func (d *PGStorage) OrdersCheck() {
 }
 
 type getOrder struct {
-	Order   string
-	Status  string
-	Accural float32
+	Order   string  `json:"order,omitempty"`
+	Status  string  `json:"status,omitempty"`
+	Accrual float32 `json:"accrual,order,omitempty"`
 }
 
 func getOrderInfo(number string) (o Order, ok bool) {
@@ -93,6 +93,8 @@ func getOrderInfo(number string) (o Order, ok bool) {
 			logging.S().Infoln("Ошибка:", err)
 			return
 		}
+		logging.S().Infoln("OUTACCURAL:", getO.Accural)
+
 		v := misc.StatusStrToInt(getO.Status)
 		o.status = &v
 		o.Accrual = &getO.Accural
