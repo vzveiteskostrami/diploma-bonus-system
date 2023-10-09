@@ -62,12 +62,6 @@ func OrdersPostf(w http.ResponseWriter, r *http.Request) {
 }
 
 func OrdersGetf(w http.ResponseWriter, r *http.Request) {
-	defer func() {
-		if err := recover(); err != nil {
-			logging.S().Infoln("ППАНИКА!!!")
-		}
-	}()
-
 	var orders []dbf.Order
 	var err error
 
@@ -94,6 +88,7 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 			}
 			//logging.S().Infoln("!!!!!!", "Отдали")
 			w.Write(buf.Bytes())
+			logging.S().Infoln("Отдали", buf)
 		}
 	}
 }

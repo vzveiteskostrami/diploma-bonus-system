@@ -98,6 +98,7 @@ func getOrderInfo(number string) (o Order, ok bool) {
 		logging.S().Infoln("Get answer no 200")
 		logging.S().Infoln("Number:", number)
 		logging.S().Infoln("Ошибка:", r.StatusCode, r.Status)
+		logging.S().Infoln("Путь:", config.Addresses.Out.Host+":"+strconv.Itoa(config.Addresses.Out.Port)+"/"+number)
 	}
 	return
 }
