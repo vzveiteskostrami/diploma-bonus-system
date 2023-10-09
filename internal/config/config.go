@@ -75,7 +75,7 @@ func ReadData() {
 	_ = flag.Value(Addresses.In)
 	flag.Var(Addresses.In, "a", "In net address host:port")
 	_ = flag.Value(Addresses.Out)
-	flag.Var(Addresses.Out, "b", "Out net address host:port")
+	flag.Var(Addresses.Out, "r", "Out net address host:port")
 	dbc := flag.String("d", "", "Database connect string")
 
 	flag.Parse()
@@ -87,6 +87,12 @@ func ReadData() {
 		Addresses.In.Host, Addresses.In.Port, err = getAddrAndPort(s)
 		if err != nil {
 			fmt.Println("Неудачный парсинг переменной окружения RUN_ADDRESS")
+		}
+	}
+	if s, ok := os.LookupEnv("ACCRUAL_SYSTEM_ADDRESS"); ok && s != "" {
+		Addresses.Out.Host, Addresses.Out.Port, err = getAddrAndPort(s)
+		if err != nil {
+			fmt.Println("Неудачный парсинг переменной окружения ACCRUAL_SYSTEM_ADDRESS")
 		}
 	}
 	if s, ok := os.LookupEnv("DATABASE_URI"); ok && s != "" {

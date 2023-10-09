@@ -12,6 +12,30 @@ import (
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/misc"
 )
 
+type withdrawInfo struct {
+	Order *string  `json:"order,omitempty"`
+	Sum   *float32 `json:"sum,omitempty"`
+}
+
+func WithdrawPostf(w http.ResponseWriter, r *http.Request) {
+	var wi withdrawInfo
+	if err := json.NewDecoder(r.Body).Decode(&wi); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if wi.Order == nil || wi.Sum == nil || *wi.Order == "" || *wi.Sum == 0 {
+		http.Error(w, "данные неполны", http.StatusInternalServerError)
+		return
+	}
+
+	code, err := dbf.Store.WithdrawAccrual(*wi.Order, *wi.Sum)
+	if err != nil {
+		http.Error(w, err.Error(), code)
+	} else {
+		w.WriteHeader(code)
+	}
+}
+
 func OrdersPostf(w http.ResponseWriter, r *http.Request) {
 	b, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -99,6 +123,38 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 		} else {
 			var buf bytes.Buffer
 			if err := json.NewEncoder(&buf).Encode(balance); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Write(buf.Bytes())
+		}
+	case <-r.Context().Done():
+		logging.S().Infoln("Получение данных прервано на клиентской стороне")
+		w.WriteHeader(http.StatusGone)
+	}
+}
+
+func WithdrawGetf(w http.ResponseWriter, r *http.Request) {
+	completed := make(chan struct{})
+
+	var list []dbf.Withdraw
+	var err error
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	go func() {
+		list, err = dbf.Store.GetUserWithdraw(r.Context().Value(auth.CPuserID).(int64))
+		completed <- struct{}{}
+	}()
+
+	select {
+	case <-completed:
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		} else {
+			var buf bytes.Buffer
+			if err := json.NewEncoder(&buf).Encode(list); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}

@@ -190,3 +190,34 @@ func ExtractRegInfo(r io.Reader) (RegInfo, error) {
 	}
 	return regIn, nil
 }
+
+func StatusIntToStr(n *int16) (r string) {
+	r = ""
+	if n == nil {
+		return
+	}
+	if *n == 0 {
+		r = "NEW"
+	} else if *n == 1 {
+		r = "PROCESSING"
+	} else if *n == 2 {
+		r = "INVALID"
+	} else if *n == 3 {
+		r = "PROCESSED"
+	}
+	return
+}
+
+func StatusStrToInt(s string) (r int16) {
+	r = -1
+	if s == "NEW" {
+		r = 0
+	} else if s == "PROCESSING" {
+		r = 1
+	} else if s == "INVALID" {
+		r = 2
+	} else if s == "PROCESSED" {
+		r = 3
+	}
+	return
+}

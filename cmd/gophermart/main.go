@@ -38,6 +38,14 @@ func main() {
 		"Starting server",
 		"addr", config.Addresses.In.Host+":"+strconv.Itoa(config.Addresses.In.Port),
 	)
+
+	go func() {
+		for {
+			time.Sleep(5000 * time.Millisecond)
+			dbf.Store.OrdersCheck()
+		}
+	}()
+
 	logging.S().Fatal(srv.ListenAndServe())
 }
 
@@ -63,30 +71,9 @@ func mainRouter() chi.Router {
 		r.Post("/orders", routes.OrdersPostf)
 		r.Get("/orders", routes.OrdersGetf)
 		r.Get("/balance", routes.BalanceGetf)
-		//r.Post("/shorten/batch", shorturl.SetJSONBatchLinkf)
-		//r.Get("/user/urls", shorturl.GetOwnerURLsListf)
-		//r.Delete("/user/urls", shorturl.DeleteOwnerURLsListf)
+		r.Post("/withdraw", routes.WithdrawPostf)
+		r.Get("/withdrawals", routes.WithdrawGetf)
 	})
-
-	/*
-		r.Route("/ping", func(r chi.Router) {
-			r.Use(logging.WithLogging)
-			r.Get("/", dbf.Store.PingDBf)
-		})
-
-		r.Route("/{shlink}", func(r chi.Router) {
-			r.Use(compressing.GZIPHandle)
-			r.Use(logging.WithLogging)
-			//r.Get("/", shorturl.GetLinkf)
-		})
-
-		r.Route("/", func(r chi.Router) {
-			r.Use(compressing.GZIPHandle)
-			r.Use(logging.WithLogging)
-			//r.Use(auth.AuthHandle)
-			//r.Post("/", shorturl.SetLinkf)
-		})
-	*/
 
 	return r
 }

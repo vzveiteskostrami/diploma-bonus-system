@@ -26,18 +26,20 @@ func S() *zap.SugaredLogger {
 }
 
 func LoggingInit() {
-	logger, err := zap.NewDevelopment()
+	var err error
+	logger, err = zap.NewDevelopment()
 	if err != nil {
 		panic(err)
 	}
-	//defer logger.Sync()
 
 	// делаем регистратор SugaredLogger
 	sugar = *logger.Sugar()
 }
 
 func LoggingSync() {
-	logger.Sync()
+	if logger != nil {
+		logger.Sync()
+	}
 }
 
 type (

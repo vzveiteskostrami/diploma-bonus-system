@@ -95,15 +95,61 @@ func (d *PGStorage) GetUserOrders(userID int64) (orders []Order, err error) {
 	orders = make([]Order, 0)
 	order := Order{}
 	for rows.Next() {
-		err = rows.Scan(&order.oid, &order.userid, &order.Number, &order.Status, &order.Accrual, &order.uploadedAt, &order.deleteFlag)
+		err = rows.Scan(&order.oid, &order.userid, &order.Number, &order.status, &order.Accrual, &order.uploadedAt, &order.deleteFlag)
 		if err != nil {
 			logging.S().Error()
 			return
 		}
+		status := misc.StatusIntToStr(order.status)
 		tm := order.uploadedAt.Format(time.RFC3339)
 		order.UploadedAt = &tm
+		order.Status = &status
 		orders = append(orders, order)
 	}
+	return
+}
+
+func (d *PGStorage) WithdrawAccrual(number string, withdraw float32) (code int, err error) {
+	code = http.StatusOK
+	rows, err := d.db.QueryContext(context.Background(), "SELECT OID,ACCRUAL,WITHDRAWN from ORDERS WHERE NUMBER=$1;", number)
+	if err == nil && rows.Err() != nil {
+		err = rows.Err()
+	}
+	if err != nil {
+		code = http.StatusInternalServerError
+		logging.S().Error(err)
+		return
+	}
+	defer rows.Close()
+
+	oid := int64(0)
+	accrual := float32(0)
+	withdrawn := float32(0)
+	if rows.Next() {
+		err = rows.Scan(&oid, &accrual, &withdrawn)
+		if err != nil {
+			code = http.StatusInternalServerError
+			logging.S().Error()
+			return
+		}
+		if accrual-withdrawn-withdraw < 0 {
+			code = http.StatusPaymentRequired
+			err = errors.New("на счету недостаточно средств")
+			return
+
+		}
+	} else {
+		code = http.StatusUnprocessableEntity
+		err = errors.New("неверный номер заказа")
+		return
+	}
+
+	_, err = d.db.ExecContext(context.Background(), "UPDATE ORDERS SET WITHDRAWN=$1,WITHDRAWN_DATE=$2 WHERE OID=$3", withdraw+withdrawn, time.Now(), oid)
+	if err != nil {
+		logging.S().Error(err)
+		code = http.StatusInternalServerError
+	}
+
 	return
 }
 
@@ -125,6 +171,32 @@ func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 			logging.S().Error()
 			return
 		}
+	}
+	return
+}
+
+func (d *PGStorage) GetUserWithdraw(userID int64) (list []Withdraw, err error) {
+	rows, err := d.db.QueryContext(context.Background(), "SELECT NUMBER,WITHDRAWN,WITHDRAWN_DATE from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG AND WITHDRAWN > 0;", userID)
+	if err == nil && rows.Err() != nil {
+		err = rows.Err()
+	}
+	if err != nil {
+		logging.S().Error(err)
+		return
+	}
+	defer rows.Close()
+
+	list = make([]Withdraw, 0)
+	item := Withdraw{}
+	for rows.Next() {
+		err = rows.Scan(&item.Order, &item.Sum, item.withdrawDate)
+		if err != nil {
+			logging.S().Error()
+			return
+		}
+		tm := item.withdrawDate.Format(time.RFC3339)
+		item.ProcessedAt = &tm
+		list = append(list, item)
 	}
 	return
 }
@@ -181,7 +253,7 @@ func (d *PGStorage) SaveOrderNum(userID int64, number string) (code int, err err
 		}
 	}
 
-	_, err = d.db.ExecContext(context.Background(), "INSERT INTO ORDERS (OID,USERID,NUMBER,STATUS,ACCRUAL,WITHDRAWN,NEW_DATE,DELETE_FLAG) VALUES ($1,$2,$3,'NEW',0,0,$4,false);", oID, userID, number, time.Now())
+	_, err = d.db.ExecContext(context.Background(), "INSERT INTO ORDERS (OID,USERID,NUMBER,STATUS,ACCRUAL,WITHDRAWN,NEW_DATE,DELETE_FLAG) VALUES ($1,$2,$3,0,0,0,$4,false);", oID, userID, number, time.Now())
 	if err != nil {
 		logging.S().Error(err)
 		code = http.StatusInternalServerError

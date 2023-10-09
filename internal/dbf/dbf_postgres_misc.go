@@ -56,7 +56,7 @@ func (d *PGStorage) tableInitData() (int64, error) {
 		"OID bigint not null," +
 		"USERID bigint not null," +
 		"NUMBER character varying(64) NOT NULL," +
-		"STATUS character varying(10) NOT NULL," +
+		"STATUS smallint NOT NULL," +
 		"ACCRUAL double precision NOT NULL," +
 		"WITHDRAWN double precision NOT NULL," +
 		"NEW_DATE timestamp with time zone NOT NULL," +
