@@ -123,6 +123,7 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			w.Write(buf.Bytes())
+			logging.S().Infoln("BALANCECURRENT2:", buf.String())
 		}
 	case <-r.Context().Done():
 		logging.S().Infoln("Получение данных прервано на клиентской стороне")
