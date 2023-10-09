@@ -120,7 +120,7 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(buf.Bytes())
 	logging.S().Infoln("BALANCEGET:", buf.String())
-	return
+	//return
 
 	/*
 
