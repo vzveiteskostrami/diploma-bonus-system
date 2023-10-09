@@ -74,7 +74,7 @@ type getOrder struct {
 func getOrderInfo(number string) (o Order, ok bool) {
 	ok = false
 	client := &http.Client{}
-	r, err := client.Get(config.Addresses.Out.Host + ":" + strconv.Itoa(config.Addresses.Out.Port) + "/" + number)
+	r, err := client.Get(config.Addresses.Out.Host + ":" + strconv.Itoa(config.Addresses.Out.Port) + "/api/orders/" + number)
 	if err != nil {
 		logging.S().Infoln("Get request error")
 		logging.S().Infoln("Number:", number)
@@ -97,7 +97,7 @@ func getOrderInfo(number string) (o Order, ok bool) {
 	} else {
 		logging.S().Infoln("Get answer no 200")
 		logging.S().Infoln("Number:", number)
-		logging.S().Infoln("Ошибка:", r.StatusCode, r.Status)
+		logging.S().Infoln("Ошибка:", r.StatusCode, http.StatusText(r.StatusCode))
 		logging.S().Infoln("Путь:", config.Addresses.Out.Host+":"+strconv.Itoa(config.Addresses.Out.Port)+"/"+number)
 	}
 	return
