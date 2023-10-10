@@ -63,9 +63,6 @@ func WithdrawGetf(w http.ResponseWriter, r *http.Request) {
 	var list []dbf.Withdraw
 	var err error
 
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-
 	go func() {
 		list, err = dbf.Store.GetUserWithdraw(r.Context().Value(auth.CPuserID).(int64))
 		completed <- struct{}{}
@@ -77,9 +74,9 @@ func WithdrawGetf(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
 			if len(list) == 0 {
-				w.Header().Set("Content-Type", "application/json")
+				//w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusNoContent)
-				w.Write([]byte("{}"))
+				//w.Write([]byte("{}"))
 			} else {
 				var buf bytes.Buffer
 				if err := json.NewEncoder(&buf).Encode(list); err != nil {

@@ -100,6 +100,7 @@ func WithLogging(h http.Handler) http.Handler {
 			"status:", responseData.status, http.StatusText(responseData.status),
 			"duration:", duration,
 			"size:", responseData.size,
+			//"ct:", w.Header().Get("Content-Type"),
 		)
 	}
 	// возвращаем функционально расширенный хендлер

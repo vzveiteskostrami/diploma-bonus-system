@@ -43,9 +43,6 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 	var orders []dbf.Order
 	var err error
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
 	go func() {
 		orders, err = dbf.Store.GetUserOrders(r.Context().Value(auth.CPuserID).(int64))
 		completed <- struct{}{}
@@ -66,6 +63,7 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
 				w.Write(buf.Bytes())
 				logging.S().Infoln("ORDERSGET:", buf.String())
 			}
