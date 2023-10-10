@@ -1,7 +1,6 @@
 package dbf
 
 import (
-	"net/http"
 	"sync"
 	"time"
 
@@ -18,12 +17,8 @@ func MakeStorage() {
 }
 
 type GSStorage interface {
-	DBFInit() int64
-	DBFClose()
-	PingDBf(w http.ResponseWriter, r *http.Request)
-	AddToDel(surl string)
-	BeginDel()
-	EndDel()
+	Init() int64
+	Close()
 	PrintDBF()
 	UserIDExists(userID int64) (ok bool, err error)
 	Register(login *string, password *string) (code int, err error)
@@ -32,7 +27,7 @@ type GSStorage interface {
 	GetUserOrders(userID int64) (orders []Order, err error)
 	GetUserBalance(userID int64) (balance Balance, err error)
 	OrdersCheck()
-	WithdrawAccrual(number string, withdraw float32) (code int, err error)
+	WithdrawAccrual(userID int64, number string, withdraw float32) (code int, err error)
 	GetUserWithdraw(userID int64) (list []Withdraw, err error)
 }
 

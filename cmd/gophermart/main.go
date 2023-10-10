@@ -25,8 +25,8 @@ func main() {
 	config.ReadData()
 
 	dbf.MakeStorage()
-	dbf.Store.DBFInit()
-	defer dbf.Store.DBFClose()
+	dbf.Store.Init()
+	defer dbf.Store.Close()
 
 	srv = &http.Server{
 		Addr:        config.Addresses.In.Host + ":" + strconv.Itoa(config.Addresses.In.Port),
@@ -41,7 +41,7 @@ func main() {
 
 	go func() {
 		for {
-			time.Sleep(5000 * time.Millisecond)
+			time.Sleep(10000 * time.Millisecond)
 			dbf.Store.OrdersCheck()
 		}
 	}()

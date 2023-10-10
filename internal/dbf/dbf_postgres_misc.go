@@ -2,93 +2,26 @@ package dbf
 
 import (
 	"context"
-	"database/sql"
 	"errors"
-	"net/http"
 	"strconv"
 
 	_ "github.com/lib/pq"
-	"github.com/vzveiteskostrami/diploma-bonus-system/internal/config"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/logging"
 )
 
-func (d *PGStorage) DBFInit() int64 {
-	var err error
-
-	d.db, err = sql.Open("postgres", config.Storage.DBConnect)
+func (d *PGStorage) UserIDExists(userID int64) (ok bool, err error) {
+	ok = false
+	rows, err := d.db.QueryContext(context.Background(), "SELECT 1 FROM UDATA WHERE USERID=$1;", userID)
+	if err == nil && rows.Err() != nil {
+		err = rows.Err()
+	}
 	if err != nil {
-		logging.S().Panic(err)
-	}
-	logging.S().Infof("Объявлено соединение с %s", config.Storage.DBConnect)
-
-	err = d.db.Ping()
-	if err != nil {
-		logging.S().Panic(err)
-	}
-	logging.S().Infof("Установлено соединение с %s", config.Storage.DBConnect)
-	nextNumDB, err := d.tableInitData()
-	if err != nil {
-		logging.S().Panic(err)
-	}
-	return nextNumDB
-}
-
-func (d *PGStorage) DBFClose() {
-	if d.db != nil {
-		d.db.Close()
-	}
-}
-
-func (d *PGStorage) tableInitData() (int64, error) {
-	if d.db == nil {
-		return -1, errors.New("база данных не инициализирована")
-	}
-
-	exec := "CREATE TABLE IF NOT EXISTS UDATA(" +
-		"USERID bigint not null," +
-		"USER_NAME character varying(64) NOT NULL," +
-		"USER_PWD character varying(64) NOT NULL," +
-		"DELETE_FLAG boolean DEFAULT false);"
-	exec += "CREATE UNIQUE INDEX IF NOT EXISTS udata1 ON udata (USERID);" +
-		"CREATE UNIQUE INDEX IF NOT EXISTS udata2 ON udata (USER_NAME);"
-
-	exec += "CREATE TABLE IF NOT EXISTS ORDERS(" +
-		"OID bigint not null," +
-		"USERID bigint not null," +
-		"NUMBER character varying(64) NOT NULL," +
-		"STATUS smallint NOT NULL," +
-		"ACCRUAL double precision NOT NULL," +
-		"WITHDRAWN double precision NOT NULL," +
-		"NEW_DATE timestamp with time zone NOT NULL," +
-		"WITHDRAWN_DATE timestamp with time zone," +
-		"DELETE_FLAG boolean DEFAULT false);"
-	exec += "CREATE UNIQUE INDEX IF NOT EXISTS orders1 ON orders (OID);" +
-		"CREATE INDEX IF NOT EXISTS orders2 ON orders (USERID);" +
-		"CREATE UNIQUE INDEX IF NOT EXISTS orders3 ON orders (NUMBER);"
-
-	exec += "create sequence if not exists gen_oid as bigint minvalue 1 no maxvalue start 1 no cycle;"
-
-	_, err := d.db.ExecContext(context.Background(), exec)
-	if err != nil {
-		return -1, err
-	}
-	return 0, nil
-}
-
-func (d *PGStorage) PingDBf(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-
-	if d.db == nil {
-		http.Error(w, `База данных не открыта`, http.StatusInternalServerError)
+		logging.S().Error(err)
 		return
 	}
-
-	err := d.db.Ping()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(http.StatusOK)
+	defer rows.Close()
+	ok = rows.Next()
+	return
 }
 
 func (d *PGStorage) PrintDBF() {
@@ -113,4 +46,27 @@ func (d *PGStorage) PrintDBF() {
 		logging.S().Infow("", "owher", strconv.FormatInt(ow, 10), "short", sho, "full", fu)
 	}
 	logging.S().Infow("`````````````")
+}
+
+func (d *PGStorage) nextOID() (oid int64, err error) {
+	rows, err := d.db.QueryContext(context.Background(), "SELECT NEXTVAL('GEN_OID');")
+	if err == nil || rows.Err() != nil {
+		err = rows.Err()
+	}
+	if err != nil {
+		logging.S().Error(err)
+		return
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		err = rows.Scan(&oid)
+		if err != nil {
+			logging.S().Error(err)
+		}
+	} else {
+		err = errors.New("не вышло получить значение счётчика")
+		logging.S().Error(err)
+	}
+	return
 }

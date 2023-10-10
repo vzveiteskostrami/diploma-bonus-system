@@ -28,7 +28,29 @@ func WithdrawPostf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	code, err := dbf.Store.WithdrawAccrual(*wi.Order, *wi.Sum)
+	if *wi.Order == "" || !misc.CheckLuhn(*wi.Order) {
+		s := `Неверный номер заказа`
+		http.Error(w, s, http.StatusUnprocessableEntity)
+		logging.S().Infoln(s, ":", *wi.Order)
+		return
+	}
+
+	userID := r.Context().Value(auth.CPuserID).(int64)
+	balance, err := dbf.Store.GetUserBalance(userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		logging.S().Infoln(err)
+		return
+	}
+
+	if *balance.Current-*wi.Sum < 0 {
+		s := "На счету недостаточно средств"
+		http.Error(w, s, http.StatusPaymentRequired)
+		logging.S().Infoln(s, ":", *wi.Order)
+		return
+	}
+
+	code, err := dbf.Store.WithdrawAccrual(userID, *wi.Order, *wi.Sum)
 	if err != nil {
 		http.Error(w, err.Error(), code)
 	} else {
