@@ -65,7 +65,7 @@ func mainRouter() chi.Router {
 	})
 
 	r.Route("/api/user", func(r chi.Router) {
-		r.Use(compressing.GZIPHandle)
+		//r.Use(compressing.GZIPHandle)
 		r.Use(logging.WithLogging)
 		r.Use(auth.AuthHandle)
 		r.Post("/orders", routes.OrdersPostf)
