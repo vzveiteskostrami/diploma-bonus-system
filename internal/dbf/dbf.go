@@ -17,9 +17,8 @@ func MakeStorage() {
 }
 
 type GSStorage interface {
-	Init() int64
+	Init()
 	Close()
-	PrintDBF()
 	UserIDExists(userID int64) (ok bool, err error)
 	Register(login *string, password *string) (code int, err error)
 	Authent(login *string, password *string) (token string, code int, err error)
@@ -44,8 +43,8 @@ type Order struct {
 }
 
 type Balance struct {
-	Current   *float32 `json:"Current,omitempty"`
-	Withdrawn *float32 `json:"Withdrawn,omitempty"`
+	Current   *float32 `json:"current,omitempty"`
+	Withdrawn *float32 `json:"withdrawn,omitempty"`
 }
 
 type Withdraw struct {

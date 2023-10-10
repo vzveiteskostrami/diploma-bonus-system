@@ -74,9 +74,7 @@ func WithdrawGetf(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		} else {
 			if len(list) == 0 {
-				//w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusNoContent)
-				//w.Write([]byte("{}"))
 			} else {
 				var buf bytes.Buffer
 				if err := json.NewEncoder(&buf).Encode(list); err != nil {
@@ -86,7 +84,6 @@ func WithdrawGetf(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
 				w.Write(buf.Bytes())
-				logging.S().Infoln("WITHDRAWGET:", buf.String())
 			}
 		}
 	case <-r.Context().Done():

@@ -27,12 +27,10 @@ func OrdersPostf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logging.S().Infoln("ORDERIN:", sOrder)
 	code, err := dbf.Store.SaveOrderNum(r.Context().Value(auth.CPuserID).(int64), sOrder)
 	if err != nil {
 		http.Error(w, err.Error(), code)
 	} else {
-		logging.S().Infoln("ORDERINOK:", sOrder)
 		w.WriteHeader(code)
 	}
 }
@@ -55,7 +53,6 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 		} else {
 			if len(orders) == 0 {
 				http.Error(w, "Нет данных для ответа", http.StatusNoContent)
-				//w.Write([]byte("{}"))
 			} else {
 				var buf bytes.Buffer
 				if err := json.NewEncoder(&buf).Encode(orders); err != nil {
@@ -65,7 +62,6 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
 				w.Write(buf.Bytes())
-				logging.S().Infoln("ORDERSGET:", buf.String())
 			}
 		}
 	case <-r.Context().Done():

@@ -3,7 +3,6 @@ package dbf
 import (
 	"context"
 	"errors"
-	"strconv"
 
 	_ "github.com/lib/pq"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/logging"
@@ -22,30 +21,6 @@ func (d *PGStorage) UserIDExists(userID int64) (ok bool, err error) {
 	defer rows.Close()
 	ok = rows.Next()
 	return
-}
-
-func (d *PGStorage) PrintDBF() {
-	rows, err := d.db.QueryContext(context.Background(), "SELECT OWNERID,SHORTURL,ORIGINALURL from urlstore;")
-	if err != nil {
-		logging.S().Panic(err)
-	}
-	if rows.Err() != nil {
-		logging.S().Panic(rows.Err())
-	}
-	defer rows.Close()
-
-	var ow int64
-	var sho string
-	var fu string
-	logging.S().Infow("--------------")
-	for rows.Next() {
-		err = rows.Scan(&ow, &sho, &fu)
-		if err != nil {
-			logging.S().Panic(err)
-		}
-		logging.S().Infow("", "owher", strconv.FormatInt(ow, 10), "short", sho, "full", fu)
-	}
-	logging.S().Infow("`````````````")
 }
 
 func (d *PGStorage) nextOID() (oid int64, err error) {

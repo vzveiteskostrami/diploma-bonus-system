@@ -34,7 +34,6 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
 			w.Write(buf.Bytes())
-			logging.S().Infoln("BALANCEGET:", buf.String())
 		}
 	case <-r.Context().Done():
 		logging.S().Infoln("Получение данных прервано на клиентской стороне")

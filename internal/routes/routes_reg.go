@@ -69,7 +69,7 @@ func Authf(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(token))
 		}
 	case <-r.Context().Done():
-		logging.S().Infow("Регистрвация прервана на клиентской стороне")
+		logging.S().Infow("Аутентификация прервана на клиентской стороне")
 		w.WriteHeader(http.StatusGone)
 	}
 }

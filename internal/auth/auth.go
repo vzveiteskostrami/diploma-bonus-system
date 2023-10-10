@@ -10,9 +10,6 @@ import (
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/misc"
 )
 
-// 0 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJPd25lcklEIjowfQ.u6d3Bcz7A-MulX5WbdBJypc56uRF2DOILD_WxqOsvOk
-// 1 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJPd25lcklEIjoxfQ.cOg2cbX9qBBQUH1yqvNIgMWX-w-PnXdPxr5tbmXg4fw
-
 type ContextParamName string
 
 var (

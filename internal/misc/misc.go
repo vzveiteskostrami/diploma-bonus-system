@@ -65,9 +65,6 @@ func generateRandom(size int) ([]byte, error) {
 
 func Shifro(s string) (string, error) {
 	key := makeKey() // ключ шифрования
-	//if err != nil {
-	//	return "", err
-	//}
 
 	// NewCipher создает и возвращает новый cipher.Block.
 	// Ключевым аргументом должен быть ключ AES, 16, 24 или 32 байта
