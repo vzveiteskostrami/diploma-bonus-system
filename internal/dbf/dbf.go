@@ -44,8 +44,8 @@ type Order struct {
 }
 
 type Balance struct {
-	Current   float32 `json:"Current,omitempty"`
-	Withdrawn float32 `json:"Withdrawn,omitempty"`
+	Current   *float32 `json:"Current,omitempty"`
+	Withdrawn *float32 `json:"Withdrawn,omitempty"`
 }
 
 type Withdraw struct {

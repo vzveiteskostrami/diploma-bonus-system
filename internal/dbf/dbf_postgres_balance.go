@@ -44,7 +44,14 @@ func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 		}
 	}
 
-	balance.Current -= balance.Withdrawn
+	if balance.Current == nil {
+		balance.Current = new(float32)
+	}
+	if balance.Withdrawn == nil {
+		balance.Withdrawn = new(float32)
+	}
+
+	*balance.Current -= *balance.Withdrawn
 
 	return
 }

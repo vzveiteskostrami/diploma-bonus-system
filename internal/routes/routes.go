@@ -43,7 +43,7 @@ func WithdrawPostf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if balance.Current-*wi.Sum < 0 {
+	if *balance.Current-*wi.Sum < 0 {
 		s := "На счету недостаточно средств"
 		http.Error(w, s, http.StatusPaymentRequired)
 		logging.S().Infoln(s, ":", *wi.Order)
