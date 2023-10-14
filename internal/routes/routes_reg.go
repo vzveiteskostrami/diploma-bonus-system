@@ -23,7 +23,7 @@ func Registerf(w http.ResponseWriter, r *http.Request) {
 	code := http.StatusOK
 
 	go func() {
-		code, err = dbf.Store.Register(regIn.Login, regIn.Password)
+		code, err = dbf.Register(regIn.Login, regIn.Password)
 		completed <- struct{}{}
 	}()
 
@@ -54,7 +54,7 @@ func Authf(w http.ResponseWriter, r *http.Request) {
 	token := ""
 
 	go func() {
-		token, code, err = dbf.Store.Authent(regIn.Login, regIn.Password)
+		token, code, err = dbf.Authent(regIn.Login, regIn.Password)
 		completed <- struct{}{}
 	}()
 

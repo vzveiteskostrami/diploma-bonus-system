@@ -34,7 +34,7 @@ func AuthHandle(next http.Handler) http.Handler {
 			return
 		}
 
-		ok, err = dbf.Store.UserIDExists(userID)
+		ok, err = dbf.UserIDExists(userID)
 		if err != nil {
 			logging.S().Error(err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -35,7 +35,7 @@ func WithdrawPostf(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userID := r.Context().Value(auth.CPuserID).(int64)
-	balance, err := dbf.Store.GetUserBalance(userID)
+	balance, err := dbf.GetUserBalance(userID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logging.S().Infoln(err)
@@ -49,7 +49,7 @@ func WithdrawPostf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	code, err := dbf.Store.WithdrawAccrual(userID, *wi.Order, *wi.Sum)
+	code, err := dbf.WithdrawAccrual(userID, *wi.Order, *wi.Sum)
 	if err != nil {
 		http.Error(w, err.Error(), code)
 	} else {
@@ -64,7 +64,7 @@ func WithdrawGetf(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	go func() {
-		list, err = dbf.Store.GetUserWithdraw(r.Context().Value(auth.CPuserID).(int64))
+		list, err = dbf.GetUserWithdraw(r.Context().Value(auth.CPuserID).(int64))
 		completed <- struct{}{}
 	}()
 
