@@ -2,6 +2,7 @@ package dbf
 
 import (
 	"context"
+	"strconv"
 
 	_ "github.com/lib/pq"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/logging"
@@ -39,16 +40,22 @@ import (
 //     Я оставляю две таблицы, но переделываю их на один запрос.
 func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 	exec := "" +
-		"SELECT 1 as A,SUM(ACCRUAL) as CURRENT from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG" +
+		"SELECT 1 as A,SUM(ACCRUAL) as CURRENT from ORDERS WHERE USERID=" + strconv.FormatInt(userID, 10) + " AND NOT DELETE_FLAG" +
 		"UNION" +
-		"SELECT 2 as A,SUM(WITHDRAW) as CURRENT from DRAWS WHERE USERID=$2 AND NOT DELETE_FLAG" +
+		"SELECT 2 as A,SUM(WITHDRAW) as CURRENT from DRAWS WHERE USERID=" + strconv.FormatInt(userID, 10) + " AND NOT DELETE_FLAG" +
 		"ORDER BY 1;"
+
+		//		SELECT 1 as A,SUM(ACCRUAL) as CURRENT from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG
+		//		UNION
+	//SELECT 2 as A,SUM(WITHDRAW) as CURRENT from DRAWS WHERE USERID=$2 AND NOT DELETE_FLAG
+	//ORDER BY 1;
 
 	rows, err := d.db.QueryContext(context.Background(), exec, userID, userID)
 	if err == nil && rows.Err() != nil {
 		err = rows.Err()
 	}
 	if err != nil {
+		logging.S().Infoln("SQL: " + exec)
 		logging.S().Error(err)
 		return
 	}
