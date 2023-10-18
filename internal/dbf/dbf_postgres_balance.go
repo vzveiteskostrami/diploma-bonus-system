@@ -39,9 +39,9 @@ import (
 //     Я оставляю две таблицы, но переделываю их на один запрос.
 func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 	exec := "" +
-		"SELECT 1,SUM(ACCRUAL) as CURRENT from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG" +
+		"SELECT 1 as A,SUM(ACCRUAL) as CURRENT from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG" +
 		"UNION" +
-		"SELECT 2,SUM(WITHDRAW) as CURRENT from DRAWS WHERE USERID=$2 AND NOT DELETE_FLAG" +
+		"SELECT 2 as A,SUM(WITHDRAW) as CURRENT from DRAWS WHERE USERID=$2 AND NOT DELETE_FLAG" +
 		"ORDER BY 1;"
 
 	rows, err := d.db.QueryContext(context.Background(), exec, userID, userID)
