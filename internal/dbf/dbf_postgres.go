@@ -14,6 +14,11 @@ type PGStorage struct {
 	db *sql.DB
 }
 
+// После просмотра вебинара я в общем и целом понял, что имеется в виду под миграциями,
+// но не понял как конкретно пользоваться пакетами. Чтение литературы в интернете ни к чему
+// конкретному не привело. Где-то пишут, нужны утилиты, где-то, что вроде работает и без них.
+// Но какой-то общей тенденции я не нашёл. Поэтому пусть создание базы останется так как есть.
+// Имена индексов поменял.
 func (d *PGStorage) tableInitData() error {
 	if d.db == nil {
 		return errors.New("база данных не инициализирована")
@@ -27,8 +32,8 @@ func (d *PGStorage) tableInitData() error {
 		"DELETE_FLAG boolean DEFAULT false" +
 		");"
 	exec += "" +
-		"CREATE UNIQUE INDEX IF NOT EXISTS udata1 ON udata (USERID);" +
-		"CREATE UNIQUE INDEX IF NOT EXISTS udata2 ON udata (USER_NAME);"
+		"CREATE UNIQUE INDEX IF NOT EXISTS udata_unique_on_userid ON udata (USERID);" +
+		"CREATE INDEX IF NOT EXISTS udata_on_user_name ON udata (USER_NAME);"
 
 	exec += "" +
 		"CREATE TABLE IF NOT EXISTS ORDERS(" +
@@ -41,9 +46,9 @@ func (d *PGStorage) tableInitData() error {
 		"DELETE_FLAG boolean DEFAULT false" +
 		");"
 	exec += "" +
-		"CREATE UNIQUE INDEX IF NOT EXISTS orders1 ON orders (OID);" +
-		"CREATE INDEX IF NOT EXISTS orders2 ON orders (USERID);" +
-		"CREATE UNIQUE INDEX IF NOT EXISTS orders3 ON orders (NUMBER);"
+		"CREATE UNIQUE INDEX IF NOT EXISTS orders_unique_on_oid ON orders (OID);" +
+		"CREATE INDEX IF NOT EXISTS orders_on_userid ON orders (USERID);" +
+		"CREATE UNIQUE INDEX IF NOT EXISTS orders_unique_on_number ON orders (NUMBER);"
 
 	exec += "" +
 		"CREATE TABLE IF NOT EXISTS DRAWS(" +
@@ -55,8 +60,8 @@ func (d *PGStorage) tableInitData() error {
 		"DELETE_FLAG boolean DEFAULT false" +
 		");"
 	exec += "" +
-		"CREATE UNIQUE INDEX IF NOT EXISTS draws1 ON draws (OID);" +
-		"CREATE INDEX IF NOT EXISTS draws2 ON draws (USERID);"
+		"CREATE UNIQUE INDEX IF NOT EXISTS draws_unique_on_oid ON draws (OID);" +
+		"CREATE INDEX IF NOT EXISTS draws_on_userid ON draws (USERID);"
 
 	exec += "" +
 		"create sequence if not exists gen_oid as bigint minvalue 1 no maxvalue start 1 no cycle;"

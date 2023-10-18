@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/auth"
+	"github.com/vzveiteskostrami/diploma-bonus-system/internal/checkout"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/compressing"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/config"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/dbf"
@@ -24,9 +25,8 @@ func main() {
 
 	config.ReadData()
 
-	dbf.MakeStorage()
-	dbf.Store.Init()
-	defer dbf.Store.Close()
+	dbf.Init()
+	defer dbf.Close()
 
 	srv = &http.Server{
 		Addr:        config.Addresses.In.Host + ":" + strconv.Itoa(config.Addresses.In.Port),
@@ -38,14 +38,6 @@ func main() {
 		"Starting server",
 		"addr", config.Addresses.In.Host+":"+strconv.Itoa(config.Addresses.In.Port),
 	)
-
-	go func() {
-		for {
-			time.Sleep(10000 * time.Millisecond)
-			dbf.Store.OrdersCheck()
-		}
-	}()
-
 	logging.S().Fatal(srv.ListenAndServe())
 }
 
@@ -68,6 +60,7 @@ func mainRouter() chi.Router {
 		r.Use(compressing.GZIPHandle)
 		r.Use(logging.WithLogging)
 		r.Use(auth.AuthHandle)
+		r.Use(checkout.RunCheck)
 		r.Post("/orders", routes.OrdersPostf)
 		r.Get("/orders", routes.OrdersGetf)
 		r.Get("/balance", routes.BalanceGetf)

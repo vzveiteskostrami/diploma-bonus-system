@@ -17,7 +17,7 @@ func BalanceGetf(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	go func() {
-		balance, err = dbf.Store.GetUserBalance(r.Context().Value(auth.CPuserID).(int64))
+		balance, err = dbf.GetUserBalance(r.Context().Value(auth.CPuserID).(int64))
 		completed <- struct{}{}
 	}()
 

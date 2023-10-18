@@ -27,7 +27,7 @@ func OrdersPostf(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	code, err := dbf.Store.SaveOrderNum(r.Context().Value(auth.CPuserID).(int64), sOrder)
+	code, err := dbf.SaveOrderNum(r.Context().Value(auth.CPuserID).(int64), sOrder)
 	if err != nil {
 		http.Error(w, err.Error(), code)
 	} else {
@@ -42,7 +42,7 @@ func OrdersGetf(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	go func() {
-		orders, err = dbf.Store.GetUserOrders(r.Context().Value(auth.CPuserID).(int64))
+		orders, err = dbf.GetUserOrders(r.Context().Value(auth.CPuserID).(int64))
 		completed <- struct{}{}
 	}()
 

@@ -13,9 +13,9 @@ import (
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/misc"
 )
 
-func (d *PGStorage) OrdersCheck() {
-	sql := "SELECT OID,NUMBER,ACCRUAL,STATUS from ORDERS WHERE NOT DELETE_FLAG AND STATUS IN (0,1);"
-	rows, err := d.db.QueryContext(context.Background(), sql)
+func (d *PGStorage) OrdersCheck(userID int64) {
+	sql := "SELECT OID,NUMBER,ACCRUAL,STATUS from ORDERS WHERE NOT DELETE_FLAG AND STATUS IN (0,1) AND USERID=$1;"
+	rows, err := d.db.QueryContext(context.Background(), sql, userID)
 	if err == nil && rows.Err() != nil {
 		err = rows.Err()
 	}
