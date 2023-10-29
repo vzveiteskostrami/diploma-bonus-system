@@ -12,6 +12,8 @@ import (
 func (d *PGStorage) WithdrawAccrual(userID int64, number string, withdraw float32) (code int, err error) {
 	code = http.StatusOK
 
+	logging.S().Infoln("Записываю списание:", withdraw)
+
 	var oID int64
 	oID, err = d.nextOID()
 	if err != nil {
@@ -25,7 +27,7 @@ func (d *PGStorage) WithdrawAccrual(userID int64, number string, withdraw float3
 		"(OID,USERID,NUMBER,STATUS,ACCRUAL,ACCRUAL_DATE,DELETE_FLAG) "+
 		"VALUES "+
 		"($1,$2,$3,0,$4,$5,false);",
-		oID, userID, number, withdraw, time.Now())
+		oID, userID, number, -withdraw, time.Now())
 	if err != nil {
 		logging.S().Error(err)
 		code = http.StatusInternalServerError
