@@ -27,9 +27,8 @@ func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 	defer rows.Close()
 
 	balance = Balance{}
-	num := int64(0)
 	if rows.Next() {
-		err = rows.Scan(&num, &balance.Current, &balance.Withdrawn)
+		err = rows.Scan(&balance.Current, &balance.Withdrawn)
 		if err != nil {
 			logging.S().Error(err)
 			return
