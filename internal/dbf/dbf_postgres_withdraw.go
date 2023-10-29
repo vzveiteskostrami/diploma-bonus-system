@@ -39,6 +39,13 @@ func (d *PGStorage) WithdrawAccrual(userID int64, number string, withdraw float3
 	accr := float32(0)
 	accrd := time.Now()
 	rows, err := d.db.QueryContext(context.Background(), "SELECT USERID,NUMBER,ACCRUAL,ACCRUAL_DATE from ORDERS", userID)
+	if err == nil && rows.Err() != nil {
+		err = rows.Err()
+	}
+	if err != nil {
+		logging.S().Error(err)
+		return
+	}
 	defer rows.Close()
 
 	fmt.Println("-----------------------------------------------------------------------")
