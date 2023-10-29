@@ -10,7 +10,7 @@ import (
 func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 	exec := "" +
 		"SELECT " +
-		"SUM(CASE WHEN ACCRUAL >=0 THEN ACCRUAL ELSE 0 END)," +
+		"SUM(CASE WHEN ACCRUAL > 0 THEN ACCRUAL ELSE 0 END)," +
 		"SUM(CASE WHEN ACCRUAL < 0 THEN ACCRUAL ELSE 0 END) " +
 		"FROM ORDERS " +
 		"WHERE USERID=$1 AND NOT DELETE_FLAG;"

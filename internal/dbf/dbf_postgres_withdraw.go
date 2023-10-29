@@ -2,6 +2,7 @@ package dbf
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -32,6 +33,21 @@ func (d *PGStorage) WithdrawAccrual(userID int64, number string, withdraw float3
 		logging.S().Error(err)
 		code = http.StatusInternalServerError
 	}
+
+	uid := int64(0)
+	num := ""
+	accr := float32(0)
+	accrd := time.Now()
+	rows, err := d.db.QueryContext(context.Background(), "SELECT USERID,NUMBER,ACCRUAL,ACCRUAL_DATE from ORDERS", userID)
+	defer rows.Close()
+
+	fmt.Println("-----------------------------------------------------------------------")
+	for rows.Next() {
+		err = rows.Scan(&uid, &num, &accr, &accrd)
+		fmt.Println(uid, num, accr, accrd)
+	}
+	fmt.Println("-----------------------------------------------------------------------")
+
 	return
 }
 
