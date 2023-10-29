@@ -20,7 +20,11 @@ func (d *PGStorage) WithdrawAccrual(userID int64, number string, withdraw float3
 		return
 	}
 
-	_, err = d.db.ExecContext(context.Background(), "INSERT INTO DRAWS (OID,USERID,NUMBER,WITHDRAW,WITHDRAW_DATE,DELETE_FLAG) VALUES ($1,$2,$3,$4,$5,false);", oID, userID, number, withdraw, time.Now())
+	_, err = d.db.ExecContext(context.Background(), "INSERT INTO ORDERS "+
+		"(OID,USERID,NUMBER,STATUS,ACCRUAL,ACCRUAL_DATE,DELETE_FLAG) "+
+		"VALUES "+
+		"($1,$2,$3,0,$4,$5,false);",
+		oID, userID, number, -withdraw, time.Now())
 	if err != nil {
 		logging.S().Error(err)
 		code = http.StatusInternalServerError
@@ -29,7 +33,7 @@ func (d *PGStorage) WithdrawAccrual(userID int64, number string, withdraw float3
 }
 
 func (d *PGStorage) GetUserWithdraw(userID int64) (list []Withdraw, err error) {
-	rows, err := d.db.QueryContext(context.Background(), "SELECT NUMBER,WITHDRAW,WITHDRAW_DATE from DRAWS WHERE USERID=$1 AND NOT DELETE_FLAG;", userID) // AND WITHDRAWN > 0
+	rows, err := d.db.QueryContext(context.Background(), "SELECT NUMBER,-ACCRUAL,ACCRUAL_DATE from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG AND ACCRUAL < 0;", userID)
 	if err == nil && rows.Err() != nil {
 		err = rows.Err()
 	}
