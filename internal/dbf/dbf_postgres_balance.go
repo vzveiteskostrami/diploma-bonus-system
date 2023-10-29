@@ -2,6 +2,7 @@ package dbf
 
 import (
 	"context"
+	"fmt"
 
 	_ "github.com/lib/pq"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/logging"
@@ -43,8 +44,13 @@ func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 		balance.Withdrawn = new(float32)
 	}
 
+	fmt.Println("Получили баланс", *balance.Current, *balance.Withdrawn)
+
 	*balance.Current += *balance.Withdrawn
 	*balance.Withdrawn *= -*balance.Withdrawn
 
+	fmt.Println("Вернули баланс", *balance.Current, *balance.Withdrawn)
+
+	d.DrawTable()
 	return
 }

@@ -34,6 +34,10 @@ func (d *PGStorage) WithdrawAccrual(userID int64, number string, withdraw float3
 		code = http.StatusInternalServerError
 	}
 
+	return
+}
+
+func (d *PGStorage) DrawTable() {
 	uid := int64(0)
 	num := ""
 	accr := float32(0)
@@ -51,11 +55,11 @@ func (d *PGStorage) WithdrawAccrual(userID int64, number string, withdraw float3
 	fmt.Println("-----------------------------------------------------------------------")
 	for rows.Next() {
 		err = rows.Scan(&uid, &num, &accr, &accrd)
-		fmt.Println(uid, num, accr, accrd)
+		if err == nil {
+			fmt.Println(uid, num, accr, accrd)
+		}
 	}
 	fmt.Println("-----------------------------------------------------------------------")
-
-	return
 }
 
 func (d *PGStorage) GetUserWithdraw(userID int64) (list []Withdraw, err error) {
