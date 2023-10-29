@@ -33,7 +33,7 @@ func (d *PGStorage) WithdrawAccrual(userID int64, number string, withdraw float3
 }
 
 func (d *PGStorage) GetUserWithdraw(userID int64) (list []Withdraw, err error) {
-	rows, err := d.db.QueryContext(context.Background(), "SELECT NUMBER,-ACCRUAL,ACCRUAL_DATE from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG AND ACCRUAL < 0;", userID)
+	rows, err := d.db.QueryContext(context.Background(), "SELECT NUMBER,ACCRUAL,ACCRUAL_DATE from ORDERS WHERE USERID=$1 AND NOT DELETE_FLAG AND ACCRUAL < 0;", userID)
 	if err == nil && rows.Err() != nil {
 		err = rows.Err()
 	}
@@ -55,6 +55,7 @@ func (d *PGStorage) GetUserWithdraw(userID int64) (list []Withdraw, err error) {
 			tm := item.withdrawDate.Format(time.RFC3339)
 			item.ProcessedAt = &tm
 		}
+		*item.Sum = -*item.Sum
 		list = append(list, item)
 	}
 	return
