@@ -47,7 +47,7 @@ func (d *PGStorage) GetUserBalance(userID int64) (balance Balance, err error) {
 	fmt.Println("Получили баланс", *balance.Current, *balance.Withdrawn)
 
 	*balance.Current += *balance.Withdrawn
-	*balance.Withdrawn *= -*balance.Withdrawn
+	*balance.Withdrawn = -*balance.Withdrawn
 
 	fmt.Println("Вернули баланс", *balance.Current, *balance.Withdrawn)
 
