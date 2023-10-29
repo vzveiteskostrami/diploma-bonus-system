@@ -20,11 +20,12 @@ func (d *PGStorage) WithdrawAccrual(userID int64, number string, withdraw float3
 		return
 	}
 
+	//Max difference between 469.48697 and -220420.84 allowed is 0.01, but difference was
 	_, err = d.db.ExecContext(context.Background(), "INSERT INTO ORDERS "+
 		"(OID,USERID,NUMBER,STATUS,ACCRUAL,ACCRUAL_DATE,DELETE_FLAG) "+
 		"VALUES "+
 		"($1,$2,$3,0,$4,$5,false);",
-		oID, userID, number, -withdraw, time.Now())
+		oID, userID, number, withdraw, time.Now())
 	if err != nil {
 		logging.S().Error(err)
 		code = http.StatusInternalServerError
