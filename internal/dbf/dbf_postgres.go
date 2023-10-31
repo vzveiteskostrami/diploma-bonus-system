@@ -24,7 +24,8 @@ func (d *PGStorage) tableInitData() error {
 
 	driver, err := postgres.WithInstance(d.db, &postgres.Config{})
 	if err != nil {
-		logging.S().Panic(err)
+		logging.S().Infoln("Ошибка 1:", err)
+		return err
 	}
 
 	m, err := migrate.NewWithDatabaseInstance(
@@ -33,11 +34,13 @@ func (d *PGStorage) tableInitData() error {
 		driver,
 	)
 	if err != nil {
-		panic(err)
+		logging.S().Infoln("Ошибка 2:", err)
+		return err
 	}
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
-		panic(err)
+		logging.S().Infoln("Ошибка 3:", err)
+		return err
 	}
 
 	return nil
