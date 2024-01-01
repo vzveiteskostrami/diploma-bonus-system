@@ -28,6 +28,7 @@ type GSStorage interface {
 	OrdersCheck(userID int64)
 	WithdrawAccrual(userID int64, number string, withdraw float32) (code int, err error)
 	GetUserWithdraw(userID int64) (list []Withdraw, err error)
+	DrawTable()
 }
 
 func Init() {
@@ -70,6 +71,10 @@ func GetUserBalance(userID int64) (balance Balance, err error) {
 
 func OrdersCheck(userID int64) {
 	store.OrdersCheck(userID)
+}
+
+func DrawTable() {
+	store.DrawTable()
 }
 
 func WithdrawAccrual(userID int64, number string, withdraw float32) (code int, err error) {

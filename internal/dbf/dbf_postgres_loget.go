@@ -95,7 +95,7 @@ func getOrderInfo(number string) (o Order, ok bool) {
 		logging.S().Infoln("Get answer no 200")
 		logging.S().Infoln("Number:", number)
 		logging.S().Infoln("Ошибка:", r.StatusCode, http.StatusText(r.StatusCode))
-		logging.S().Infoln("Путь:", config.Addresses.Out.Host+":"+strconv.Itoa(config.Addresses.Out.Port)+"/"+number)
+		logging.S().Infoln("Путь:", config.Addresses.Out.Host+":"+strconv.Itoa(config.Addresses.Out.Port)+"/api/orders/"+number)
 	}
 	return
 }

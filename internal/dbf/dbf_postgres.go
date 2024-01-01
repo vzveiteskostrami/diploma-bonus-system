@@ -1,10 +1,12 @@
 package dbf
 
 import (
-	"context"
 	"database/sql"
 	"errors"
 
+	"github.com/golang-migrate/migrate"
+	"github.com/golang-migrate/migrate/database/postgres"
+	_ "github.com/golang-migrate/migrate/source/file"
 	_ "github.com/lib/pq"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/config"
 	"github.com/vzveiteskostrami/diploma-bonus-system/internal/logging"
@@ -14,12 +16,69 @@ type PGStorage struct {
 	db *sql.DB
 }
 
+// вот они, миграции!
+func (d *PGStorage) tableInitData() error {
+	if d.db == nil {
+		return errors.New("база данных не инициализирована")
+	}
+
+	driver, err := postgres.WithInstance(d.db, &postgres.Config{})
+	if err != nil {
+		logging.S().Infoln("Ошибка 1:", err)
+		return err
+	}
+
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://migrations",
+		"postgres",
+		driver,
+	)
+	if err != nil {
+		logging.S().Infoln("Ошибка 2:", err)
+		return err
+	}
+	err = m.Up()
+	if err != nil && err != migrate.ErrNoChange {
+		logging.S().Infoln("Ошибка 3:", err)
+		return err
+	}
+
+	return nil
+}
+
+func (d *PGStorage) Init() {
+	var err error
+
+	d.db, err = sql.Open("postgres", config.Storage.DBConnect)
+	if err != nil {
+		logging.S().Panic(err)
+	}
+	logging.S().Infof("Объявлено соединение с %s", config.Storage.DBConnect)
+
+	err = d.db.Ping()
+	if err != nil {
+		logging.S().Panic(err)
+	}
+	logging.S().Infof("Установлено соединение с %s", config.Storage.DBConnect)
+	err = d.tableInitData()
+	if err != nil {
+		logging.S().Panic(err)
+	}
+}
+
+func (d *PGStorage) Close() {
+	if d.db != nil {
+		d.db.Close()
+	}
+}
+
+/*
 // После просмотра вебинара я в общем и целом понял, что имеется в виду под миграциями,
 // но не понял как конкретно пользоваться пакетами. Чтение литературы в интернете ни к чему
 // конкретному не привело. Где-то пишут, нужны утилиты, где-то, что вроде работает и без них.
 // Но какой-то общей тенденции я не нашёл. Поэтому пусть создание базы останется так как есть.
 // Имена индексов поменял.
-func (d *PGStorage) tableInitData() error {
+func (d *PGStorage) TrueTableInitData() error {
 	if d.db == nil {
 		return errors.New("база данных не инициализирована")
 	}
@@ -42,7 +101,7 @@ func (d *PGStorage) tableInitData() error {
 		"NUMBER character varying(64) NOT NULL," +
 		"STATUS smallint NOT NULL," +
 		"ACCRUAL double precision NOT NULL," +
-		"NEW_DATE timestamp with time zone NOT NULL," +
+		"ACCRUAL_DATE timestamp with time zone NOT NULL," +
 		"DELETE_FLAG boolean DEFAULT false" +
 		");"
 	exec += "" +
@@ -72,29 +131,4 @@ func (d *PGStorage) tableInitData() error {
 	}
 	return nil
 }
-
-func (d *PGStorage) Init() {
-	var err error
-
-	d.db, err = sql.Open("postgres", config.Storage.DBConnect)
-	if err != nil {
-		logging.S().Panic(err)
-	}
-	logging.S().Infof("Объявлено соединение с %s", config.Storage.DBConnect)
-
-	err = d.db.Ping()
-	if err != nil {
-		logging.S().Panic(err)
-	}
-	logging.S().Infof("Установлено соединение с %s", config.Storage.DBConnect)
-	err = d.tableInitData()
-	if err != nil {
-		logging.S().Panic(err)
-	}
-}
-
-func (d *PGStorage) Close() {
-	if d.db != nil {
-		d.db.Close()
-	}
-}
+*/
